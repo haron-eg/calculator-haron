@@ -1,0 +1,237 @@
+Public Class CalculatorForm
+    Inherits System.Windows.Forms.Form
+
+    Private lastValue As Double = 0
+    Private operation As String = ""
+    Private isNewNumber As Boolean = True
+
+    ' UI Components
+    Private WithEvents btnEquals As System.Windows.Forms.Button
+    Private WithEvents btnAdd As System.Windows.Forms.Button
+    Private WithEvents btnSubtract As System.Windows.Forms.Button
+    Private WithEvents btnMultiply As System.Windows.Forms.Button
+    Private WithEvents btnDivide As System.Windows.Forms.Button
+    Private WithEvents btnClear As System.Windows.Forms.Button
+    Private WithEvents txtDisplay As System.Windows.Forms.TextBox
+    Private WithEvents btn0 As System.Windows.Forms.Button
+    Private WithEvents btn1 As System.Windows.Forms.Button
+    Private WithEvents btn2 As System.Windows.Forms.Button
+    Private WithEvents btn3 As System.Windows.Forms.Button
+    Private WithEvents btn4 As System.Windows.Forms.Button
+    Private WithEvents btn5 As System.Windows.Forms.Button
+    Private WithEvents btn6 As System.Windows.Forms.Button
+    Private WithEvents btn7 As System.Windows.Forms.Button
+    Private WithEvents btn8 As System.Windows.Forms.Button
+    Private WithEvents btn9 As System.Windows.Forms.Button
+    Private WithEvents btnDecimal As System.Windows.Forms.Button
+
+    Public Sub New()
+        InitializeComponent()
+    End Sub
+
+    Private Sub InitializeComponent()
+        Me.SuspendLayout()
+
+        ' Form properties
+        Me.Text = "Simple Calculator"
+        Me.Width = 350
+        Me.Height = 500
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
+        Me.BackColor = System.Drawing.Color.LightGray
+
+        ' Display TextBox
+        txtDisplay = New System.Windows.Forms.TextBox()
+        txtDisplay.Location = New System.Drawing.Point(10, 10)
+        txtDisplay.Size = New System.Drawing.Size(310, 40)
+        txtDisplay.Font = New System.Drawing.Font("Arial", 18)
+        txtDisplay.Text = "0"
+        txtDisplay.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        txtDisplay.ReadOnly = True
+        Me.Controls.Add(txtDisplay)
+
+        ' Button layout positions
+        Dim btnWidth As Integer = 70
+        Dim btnHeight As Integer = 50
+        Dim startX As Integer = 10
+        Dim startY As Integer = 60
+
+        ' Number buttons
+        CreateNumberButtons(startX, startY, btnWidth, btnHeight)
+
+        ' Operation buttons
+        Dim opX As Integer = startX + (btnWidth + 5) * 3 + 5
+        CreateOperationButtons(opX, startY, btnWidth, btnHeight)
+
+        Me.ResumeLayout(False)
+    End Sub
+
+    Private Sub CreateNumberButtons(startX As Integer, startY As Integer, btnWidth As Integer, btnHeight As Integer)
+        Dim buttons As String() = {"7", "8", "9", "4", "5", "6", "1", "2", "3"}
+        Dim index As Integer = 0
+
+        For row As Integer = 0 To 2
+            For col As Integer = 0 To 2
+                Dim btn As New System.Windows.Forms.Button()
+                btn.Text = buttons(index)
+                btn.Location = New System.Drawing.Point(startX + (btnWidth + 5) * col, startY + (btnHeight + 5) * row)
+                btn.Size = New System.Drawing.Size(btnWidth, btnHeight)
+                btn.Font = New System.Drawing.Font("Arial", 14, System.Drawing.FontStyle.Bold)
+                AddHandler btn.Click, AddressOf NumberButton_Click
+                Me.Controls.Add(btn)
+                index += 1
+            Next
+        Next
+
+        ' Zero button
+        btn0 = New System.Windows.Forms.Button()
+        btn0.Text = "0"
+        btn0.Location = New System.Drawing.Point(startX, startY + (btnHeight + 5) * 3)
+        btn0.Size = New System.Drawing.Size(btnWidth * 2 + 5, btnHeight)
+        btn0.Font = New System.Drawing.Font("Arial", 14, System.Drawing.FontStyle.Bold)
+        AddHandler btn0.Click, AddressOf NumberButton_Click
+        Me.Controls.Add(btn0)
+
+        ' Decimal button
+        btnDecimal = New System.Windows.Forms.Button()
+        btnDecimal.Text = "."
+        btnDecimal.Location = New System.Drawing.Point(startX + (btnWidth + 5) * 2, startY + (btnHeight + 5) * 3)
+        btnDecimal.Size = New System.Drawing.Size(btnWidth, btnHeight)
+        btnDecimal.Font = New System.Drawing.Font("Arial", 14, System.Drawing.FontStyle.Bold)
+        AddHandler btnDecimal.Click, AddressOf DecimalButton_Click
+        Me.Controls.Add(btnDecimal)
+    End Sub
+
+    Private Sub CreateOperationButtons(startX As Integer, startY As Integer, btnWidth As Integer, btnHeight As Integer)
+        btnAdd = New System.Windows.Forms.Button()
+        btnAdd.Text = "+"
+        btnAdd.Location = New System.Drawing.Point(startX, startY)
+        btnAdd.Size = New System.Drawing.Size(btnWidth, btnHeight)
+        btnAdd.Font = New System.Drawing.Font("Arial", 14, System.Drawing.FontStyle.Bold)
+        btnAdd.BackColor = System.Drawing.Color.Orange
+        AddHandler btnAdd.Click, AddressOf OperationButton_Click
+        Me.Controls.Add(btnAdd)
+
+        btnSubtract = New System.Windows.Forms.Button()
+        btnSubtract.Text = "-"
+        btnSubtract.Location = New System.Drawing.Point(startX, startY + (btnHeight + 5))
+        btnSubtract.Size = New System.Drawing.Size(btnWidth, btnHeight)
+        btnSubtract.Font = New System.Drawing.Font("Arial", 14, System.Drawing.FontStyle.Bold)
+        btnSubtract.BackColor = System.Drawing.Color.Orange
+        AddHandler btnSubtract.Click, AddressOf OperationButton_Click
+        Me.Controls.Add(btnSubtract)
+
+        btnMultiply = New System.Windows.Forms.Button()
+        btnMultiply.Text = "*"
+        btnMultiply.Location = New System.Drawing.Point(startX, startY + (btnHeight + 5) * 2)
+        btnMultiply.Size = New System.Drawing.Size(btnWidth, btnHeight)
+        btnMultiply.Font = New System.Drawing.Font("Arial", 14, System.Drawing.FontStyle.Bold)
+        btnMultiply.BackColor = System.Drawing.Color.Orange
+        AddHandler btnMultiply.Click, AddressOf OperationButton_Click
+        Me.Controls.Add(btnMultiply)
+
+        btnDivide = New System.Windows.Forms.Button()
+        btnDivide.Text = "/"
+        btnDivide.Location = New System.Drawing.Point(startX, startY + (btnHeight + 5) * 3)
+        btnDivide.Size = New System.Drawing.Size(btnWidth, btnHeight)
+        btnDivide.Font = New System.Drawing.Font("Arial", 14, System.Drawing.FontStyle.Bold)
+        btnDivide.BackColor = System.Drawing.Color.Orange
+        AddHandler btnDivide.Click, AddressOf OperationButton_Click
+        Me.Controls.Add(btnDivide)
+
+        btnEquals = New System.Windows.Forms.Button()
+        btnEquals.Text = "="
+        btnEquals.Location = New System.Drawing.Point(startX, startY + (btnHeight + 5) * 4)
+        btnEquals.Size = New System.Drawing.Size(btnWidth, btnHeight)
+        btnEquals.Font = New System.Drawing.Font("Arial", 14, System.Drawing.FontStyle.Bold)
+        btnEquals.BackColor = System.Drawing.Color.Green
+        btnEquals.ForeColor = System.Drawing.Color.White
+        AddHandler btnEquals.Click, AddressOf EqualsButton_Click
+        Me.Controls.Add(btnEquals)
+
+        btnClear = New System.Windows.Forms.Button()
+        btnClear.Text = "C"
+        btnClear.Location = New System.Drawing.Point(startX + (btnWidth + 5), startY + (btnHeight + 5) * 4)
+        btnClear.Size = New System.Drawing.Size(btnWidth * 2 + 5, btnHeight)
+        btnClear.Font = New System.Drawing.Font("Arial", 14, System.Drawing.FontStyle.Bold)
+        btnClear.BackColor = System.Drawing.Color.Red
+        btnClear.ForeColor = System.Drawing.Color.White
+        AddHandler btnClear.Click, AddressOf ClearButton_Click
+        Me.Controls.Add(btnClear)
+    End Sub
+
+    Private Sub NumberButton_Click(sender As Object, e As EventArgs)
+        Dim btn As System.Windows.Forms.Button = CType(sender, System.Windows.Forms.Button)
+        If isNewNumber Then
+            txtDisplay.Text = btn.Text
+            isNewNumber = False
+        Else
+            If txtDisplay.Text <> "0" Then
+                txtDisplay.Text &= btn.Text
+            Else
+                txtDisplay.Text = btn.Text
+            End If
+        End If
+    End Sub
+
+    Private Sub DecimalButton_Click(sender As Object, e As EventArgs)
+        If isNewNumber Then
+            txtDisplay.Text = "0."
+            isNewNumber = False
+        ElseIf Not txtDisplay.Text.Contains(".") Then
+            txtDisplay.Text &= "."
+        End If
+    End Sub
+
+    Private Sub OperationButton_Click(sender As Object, e As EventArgs)
+        Dim btn As System.Windows.Forms.Button = CType(sender, System.Windows.Forms.Button)
+
+        If operation <> "" Then
+            EqualsButton_Click(Nothing, Nothing)
+        End If
+
+        lastValue = CDbl(txtDisplay.Text)
+        operation = btn.Text
+        isNewNumber = True
+    End Sub
+
+    Private Sub EqualsButton_Click(sender As Object, e As EventArgs)
+        If operation = "" Then Return
+
+        Dim currentValue As Double = CDbl(txtDisplay.Text)
+        Dim result As Double = 0
+
+        Select Case operation
+            Case "+"
+                result = lastValue + currentValue
+            Case "-"
+                result = lastValue - currentValue
+            Case "*"
+                result = lastValue * currentValue
+            Case "/"
+                If currentValue = 0 Then
+                    txtDisplay.Text = "Error: Division by Zero"
+                    isNewNumber = True
+                    operation = ""
+                    Return
+                End If
+                result = lastValue / currentValue
+        End Select
+
+        txtDisplay.Text = result.ToString()
+        operation = ""
+        isNewNumber = True
+    End Sub
+
+    Private Sub ClearButton_Click(sender As Object, e As EventArgs)
+        txtDisplay.Text = "0"
+        lastValue = 0
+        operation = ""
+        isNewNumber = True
+    End Sub
+
+    <System.STAThread()>
+    Public Shared Sub Main()
+        System.Windows.Forms.Application.EnableVisualStyles()
+        System.Windows.Forms.Application.Run(New CalculatorForm())
+    End Sub
+End Class
